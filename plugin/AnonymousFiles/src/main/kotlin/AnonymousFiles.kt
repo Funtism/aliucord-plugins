@@ -4,25 +4,17 @@ import com.aliucord.entities.Plugin
 import com.aliucord.patcher.after
 import com.lytefast.flexinput.model.Attachment
 
-private const val LENGTH = 8
-
 @AliucordPlugin
 class AnonymousFiles : Plugin() {
-    private val charPool by lazy {
-        ('a'..'z') + ('A'..'Z') + ('0'..'9')
-    }
+    private val specificWord = "anonymous" // specific word here
 
     override fun start(context: Context) {
         patcher.after<Attachment<*>>("getDisplayName") {
-            val ext = (it.result as String).substringAfterLast('.')
-
-            var str = ""
-
-            repeat(LENGTH) {
-                str += charPool.random()
-            }
-
-            it.result = "$str.$ext"
+            val originalName = it.result as String
+            val ext = originalName.substringAfterLast('.', "")
+            
+            // use the specific word + counter if needed to avoid duplicates
+            it.result = if (ext.isNotEmpty()) "$specificWord.$ext" else specificWord
         }
     }
 
